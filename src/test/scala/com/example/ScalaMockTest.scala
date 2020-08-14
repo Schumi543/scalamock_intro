@@ -65,6 +65,20 @@ class ScalaMockTest extends AnyFunSuite with MockFactory{
       Greetings.sayHello("Jack", formatter)
     }
   }
+
+  test("WithOrder") {
+    val mockFormatter = mock[Formatter]
+
+    inAnyOrder {
+      (mockFormatter.format _).expects("Mr Bond").returns("Ah, Mr Bond. I've been expecting you")
+      (mockFormatter.format _).expects("Natsu").returns("Not now Natsu!").atLeastTwice()
+    }
+
+    Greetings.sayHello("Natsu", mockFormatter)
+    Greetings.sayHello("Natsu", mockFormatter)
+    Greetings.sayHello("Mr Bond", mockFormatter)
+    Greetings.sayHello("Natsu", mockFormatter)
+  }
 }
 
 object Greetings {
