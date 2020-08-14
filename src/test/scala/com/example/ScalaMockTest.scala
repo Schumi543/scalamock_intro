@@ -2,6 +2,7 @@ package com.example
 
 import com.example.Greetings.Formatter
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.exceptions.TestFailedException
 import org.scalatest.funsuite.AnyFunSuite
 
 class ScalaMockTest extends AnyFunSuite with MockFactory{
@@ -41,6 +42,28 @@ class ScalaMockTest extends AnyFunSuite with MockFactory{
 
     Greetings.sayHello("Wendy", australianFormat)
     Greetings.sayHello("Gray", australianFormat)
+  }
+
+  test("WithParamAssertion") {
+    val teamNatsu = Set("Natsu", "Lucy", "Happy", "Erza", "Gray", "Wendy", "Carla")
+    val formatter = mock[Formatter]
+
+    def assertTeamNatsu(s: String): Unit = {
+      assert(teamNatsu.contains(s))
+    }
+
+    // argAssert fails early
+    (formatter.format _).expects(argAssert(assertTeamNatsu _)).onCall { s: String => s"Yo $s" }.anyNumberOfTimes()
+
+    // 'where' verifies at the end of the test
+    (formatter.format _).expects(where { s: String => teamNatsu contains s }).onCall { s: String => s"Yo $s" }.anyNumberOfTimes()
+
+    Greetings.sayHello("Carla", formatter)
+    Greetings.sayHello("Happy", formatter)
+    Greetings.sayHello("Lucy", formatter)
+    intercept[TestFailedException] {
+      Greetings.sayHello("Jack", formatter)
+    }
   }
 }
 
