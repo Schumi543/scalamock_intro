@@ -33,6 +33,15 @@ class ScalaMockTest extends AnyFunSuite with MockFactory{
       Greetings.sayHello("Erza", brokenFormatter)
     }
   }
+
+  test("WithVariableParameters") {
+    val australianFormat = mock[Formatter]
+
+    (australianFormat.format _).expects(*).onCall { s: String => s"G'day $s" }.twice()
+
+    Greetings.sayHello("Wendy", australianFormat)
+    Greetings.sayHello("Gray", australianFormat)
+  }
 }
 
 object Greetings {
